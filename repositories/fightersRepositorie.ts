@@ -21,5 +21,14 @@ async function updateFighter(fighter: string, win: boolean, defeat: boolean, dra
 
 }
 
-const fighterRepositorie = {updateFighter};
+async function getRanking() {
+
+    const fighters = await db.query(
+        `SELECT username, wins, losses, draws
+        FROM fighters ORDER BY wins DESC, draws DESC`
+    );
+    return fighters.rows;
+}
+
+const fighterRepositorie = {updateFighter, getRanking};
 export default fighterRepositorie;

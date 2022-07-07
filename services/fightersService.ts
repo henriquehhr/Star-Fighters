@@ -47,5 +47,11 @@ async function compareStarCount(firstUser: string, secondUser: string) {
     }
 }
 
-const fightersService = {compareStarCount};
+async function getRanking() {
+    const ranking = {fighters: []};
+    ranking.fighters = await fighterRepositorie.getRanking();
+    return ranking;
+}
+
+const fightersService = {compareStarCount, getRanking};
 export default fightersService;
