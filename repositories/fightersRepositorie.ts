@@ -27,6 +27,7 @@ async function getRanking() {
         `SELECT username, wins, losses, draws
         FROM fighters ORDER BY wins DESC, draws DESC`
     );
+    
     return fighters.rows;
 }
 
