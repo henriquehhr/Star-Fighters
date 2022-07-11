@@ -3,18 +3,18 @@ import fighterRepositorie, { Fighter } from "../repositories/fightersRepositorie
 import {AxiosResponse} from "axios";
 //import Fighter from "../repositories/fightersRepositorie.js";
 
-interface Teste {
+interface GitHubRepository {
     stargazers_count: number;
 }
 
 async function compareStarCount(firstUser: string, secondUser: string) {
 
-    let firstUserRepos: AxiosResponse<Teste[]>;
-    let secondUserRepos: AxiosResponse<Teste[]>;
+    let firstUserRepos: AxiosResponse<GitHubRepository[]>;
+    let secondUserRepos: AxiosResponse<GitHubRepository[]>;
     
     try {
-        firstUserRepos = await axios.get<Teste[]>(`https://api.github.com/users/${firstUser}/repos`);
-        secondUserRepos = await axios.get<Teste[]>(`https://api.github.com/users/${secondUser}/repos`);    
+        firstUserRepos = await axios.get<GitHubRepository[]>(`https://api.github.com/users/${firstUser}/repos`);
+        secondUserRepos = await axios.get<GitHubRepository[]>(`https://api.github.com/users/${secondUser}/repos`);    
     } catch (error) {
         throw {type: "Not Found", message: "User not found", error};
     }
