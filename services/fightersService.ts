@@ -1,14 +1,20 @@
 import axios from "axios";
-import fighterRepositorie from "../repositories/fightersRepositorie.js";
+import fighterRepositorie, { Fighter } from "../repositories/fightersRepositorie.js";
+import {AxiosResponse} from "axios";
+//import Fighter from "../repositories/fightersRepositorie.js";
+
+interface Teste {
+    stargazers_count: number;
+}
 
 async function compareStarCount(firstUser: string, secondUser: string) {
 
-    let firstUserRepos;
-    let secondUserRepos;
+    let firstUserRepos: AxiosResponse<Teste[]>;
+    let secondUserRepos: AxiosResponse<Teste[]>;
     
     try {
-        firstUserRepos = await axios.get(`https://api.github.com/users/${firstUser}/repos`);
-        secondUserRepos = await axios.get(`https://api.github.com/users/${secondUser}/repos`);    
+        firstUserRepos = await axios.get<Teste[]>(`https://api.github.com/users/${firstUser}/repos`);
+        secondUserRepos = await axios.get<Teste[]>(`https://api.github.com/users/${secondUser}/repos`);    
     } catch (error) {
         throw {type: "Not Found", message: "User not found", error};
     }
@@ -19,8 +25,8 @@ async function compareStarCount(firstUser: string, secondUser: string) {
     secondUserRepos.data.forEach(repo => secondUserStars += repo.stargazers_count);
     //TODO: salvar no banco de dados
     if(firstUserStars > secondUserStars) {
-        await fighterRepositorie.updateFighter(firstUser, true, false, false);
-        await fighterRepositorie.updateFighter(secondUser, false, true, false);
+        await fighterRepositorie.updateFighter({username: firstUser, wins: 1, losses: 0, draws: 0});
+        await fighterRepositorie.updateFighter({username: secondUser, wins: 0, losses: 1, draws: 0});
         return {
             winner: firstUser,
             loser: secondUser,
@@ -28,8 +34,8 @@ async function compareStarCount(firstUser: string, secondUser: string) {
         };
     }
     else if(secondUserStars > firstUserStars) {
-        await fighterRepositorie.updateFighter(firstUser, false, true, false);
-        await fighterRepositorie.updateFighter(secondUser, true, false, false);
+        await fighterRepositorie.updateFighter({username: firstUser, wins: 0, losses: 1, draws: 0});
+        await fighterRepositorie.updateFighter({username: secondUser, wins: 1, losses: 0, draws: 0});
         return {
             winner: secondUser,
             loser: firstUser,
@@ -37,8 +43,8 @@ async function compareStarCount(firstUser: string, secondUser: string) {
         };
     }
     else {
-        await fighterRepositorie.updateFighter(firstUser, false, false, true);
-        await fighterRepositorie.updateFighter(secondUser, false, false, true);
+        await fighterRepositorie.updateFighter({username: firstUser, wins: 0, losses: 0, draws: 1});
+        await fighterRepositorie.updateFighter({username: secondUser, wins: 0, losses: 0, draws: 1});
         return {
             winner: null,
             loser: null,

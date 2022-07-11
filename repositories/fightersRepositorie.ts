@@ -1,29 +1,37 @@
 import db from "./../database/database.js";
 
-async function updateFighter(fighter: string, win: boolean, defeat: boolean, draw: boolean){
+export interface Fighter {
+    username: string;
+    wins: number;
+    losses: number;
+    draws: number;
+}
 
-    const fighterData = await db.query("SELECT * FROM fighters WHERE username = $1", [fighter]);
+async function updateFighter(fighter: Fighter){
+
+    const {username, wins, losses, draws} = fighter;
+    const fighterData = await db.query<Fighter>("SELECT * FROM fighters WHERE username = $1", [fighter]);
     if(fighterData.rowCount === 0) {
         await db.query(
             `INSERT INTO fighters (username, wins, losses, draws)
-            VALUES ($1, $2, $3, $4)`, [fighter, +win, +defeat, +draw]
+            VALUES ($1, $2, $3, $4)`, [username, wins, losses, draws]
         );
         return;
     }
-    const query = win ? "wins" : (defeat ? "losses" : (draw ? "draws" : ""));
-    const value = win ? fighterData.rows[0].wins : (defeat ? fighterData.rows[0].losses : (draw ? fighterData.rows[0].draws : 0));
+    const query = wins ? "wins" : (losses ? "losses" : (draws ? "draws" : ""));
+    const value = wins ? fighterData.rows[0].wins : (losses ? fighterData.rows[0].losses : (draws ? fighterData.rows[0].draws : 0));
     await db.query(
         `UPDATE fighters
         SET ` + query + ` = $1
         WHERE username = $2`,
-        [value + 1, fighter]
+        [value + 1, username]
     );
 
 }
 
 async function getRanking() {
 
-    const fighters = await db.query(
+    const fighters = await db.query<Fighter>(
         `SELECT username, wins, losses, draws
         FROM fighters ORDER BY wins DESC, draws DESC`
     );

@@ -1,8 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import fightersService from "../services/fightersService.js";
 
+
+interface battle {
+    firstUser: string;
+    secondUser: string;
+};
+
 export async function compareStarCount (req: Request, res: Response){
-    const {firstUser, secondUser} = req.body;
+    const {firstUser, secondUser}: battle = req.body;
     const battleResult = await fightersService.compareStarCount(firstUser, secondUser);
     res.send(battleResult);
 }
